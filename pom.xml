@@ -64,7 +64,7 @@
                     <includePluginDependencies>false</includePluginDependencies>
                     <classpathScope>compile</classpathScope>
                     <!-- allows you to specify which topology class to run by specifying -Dexec.MainClass= on the command line -->
-                    <mainClass>SocketListener</mainClass>
+                    <mainClass>SocketServerExample</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -79,7 +79,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <mainClass>SocketListener</mainClass>
+                            <mainClass>SocketServerExample</mainClass>
                         </manifest>
                         <!--<manifestEntries>-->
                         <!--<Premain-Class>Agent</Premain-Class>-->

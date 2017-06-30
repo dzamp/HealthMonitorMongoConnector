@@ -7,6 +7,7 @@ import com.mongodb.connection.Connection;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -33,11 +34,16 @@ public class SocketServerExample {
         dataMapper = new HashMap<SocketChannel, List>();
     }
 
+
+
     public static void main(String[] args) throws Exception {
+        PropertyFileLoader propertyFileLoader = new PropertyFileLoader();
 
-        final SocketServerExample serverSocket = new SocketServerExample("localhost", 8090);
+        final SocketServerExample serverSocket = new SocketServerExample(propertyFileLoader.getProperty("address"),
+                Integer.valueOf(propertyFileLoader.getProperty("port")));
 
-        serverSocket.dbClient = new MongoClient("localhost",new MongoClientOptions.Builder().maxConnectionIdleTime(60* 60 * 60).build());
+        serverSocket.dbClient = new MongoClient(propertyFileLoader.getProperty("mongo_address"),new MongoClientOptions.Builder()
+                .maxConnectionIdleTime(Integer.valueOf(propertyFileLoader.getProperty("mongo_connection_idle_time"))).build());
         serverSocket.db = serverSocket.dbClient.getDatabase(MONGO_DB);
 
         Runnable server = new Runnable() {
@@ -54,8 +60,6 @@ public class SocketServerExample {
         ArrayList<Thread> listOfThreads = new ArrayList<>();
         listOfThreads.add(new Thread(server));
         listOfThreads.get(0).start();
-        // Thread.sleep(3000);
-
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -160,9 +164,7 @@ public class SocketServerExample {
             String[] values = row.split(",");
             listOfDocuments.add(new Document("id", id).append("pressure", values[0]).append("timestamp", Long.valueOf(values[1])));
         }
-        // insertDocument(values[0],Integer.valueOf(values[1]), Long.valueOf(values[2]));
         collection.insertMany(listOfDocuments);
-        // System.out.println("Got: " + new String(data));
     }
 
     //Write to the client
@@ -176,11 +178,4 @@ public class SocketServerExample {
         }
     }
 
-    public void insertDocument(String id, int pressureValue, long timestamp){
-        this.db = this.dbClient.getDatabase(MONGO_DB);
-        MongoCollection<Document> coll;
-        coll = db.getCollection("pressure_" + id);
-        Document document = new Document("id", id).append("pressure", pressureValue).append("timestamp", timestamp);
-        coll.insertOne(document);
-    }
 }
